@@ -1,13 +1,13 @@
-import { logger, metro } from "@vendetta";
+import { logger, metro, patcher } from "@vendetta";
 import Settings from "./Settings";
-import { patcher } from "@vendetta";
+import { storage } from "@vendetta/plugin";
 
 patcher.before(
   "dispatch",
   metro.common.FluxDispatcher,
   ([e]) => {
     if (e.type == "MESSAGE_CREATE") {
-      e.message.content = "test (hopefully it works)"
+      e.message.content = `test (hopefully it works) (key is ${storage.key})`;
       return [e]
     }
   }

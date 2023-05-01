@@ -15,6 +15,7 @@ export default () => (
       placeholder="Secret key to encrypt messages"
       returnKeyType="done"
       secureTextEntry={true}
+      defaultValue={storage.key || ""}
     />}
   />
 </ScrollView>
