@@ -1,1 +1,1 @@
-{"name":"SecretMessage","description":"Send messages that only people with the key can read","authors":[{"name":"DeltAndy","id":"725826614478372875"}],"main":"index.js","vendetta":{"icon":"ic_lock"},"hash":"a750bb51803ae72a228d9d381864de1066aaf1a61577fe55dab1c53f6695c26b"}
+{"name":"SecretMessage","description":"Send messages that only people with the key can read","authors":[{"name":"DeltAndy","id":"725826614478372875"}],"main":"index.js","vendetta":{"icon":"ic_lock"},"hash":"15baa9ee876755dea892065da3c95bf30a0175e6fd2d7c08120c312d00f4e92a"}
