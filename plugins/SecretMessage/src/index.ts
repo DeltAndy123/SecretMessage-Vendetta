@@ -6,6 +6,7 @@ import { decryptMessage } from "./util/encrypt";
 const unload = [
   patcher.before("dispatch", metro.common.FluxDispatcher, ([e]) => {
     switch (e.type) {
+      // Decrypt received messages
       case "MESSAGE_CREATE":
         e.message.content = decryptMessage(e.message.content);
         return [e];
@@ -17,6 +18,10 @@ const unload = [
           m.content = decryptMessage(m.content);
         });
         return [e];
+
+      // Encrypt sent messages
+      case "sendMessage":
+        logger.info(e)
     }
     if (storage.debug) logger.info(e);
   }),

@@ -28,6 +28,14 @@ export default () => {
         />}
       />
       <FormRow
+        label="Enable encryption"
+        subLabel="Messages that you send will be encrypted."
+        trailing={<FormSwitch
+          value={storage.enable_encryption ?? true}
+          onValueChange={(value: boolean) => storage.enable_encryption = value}
+        />}
+      />
+      <FormRow
         label="Debug Mode"
         subLabel="Log debug messages to console."
         trailing={<FormSwitch
