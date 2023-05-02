@@ -2,6 +2,10 @@ import { logger, metro, patcher } from "@vendetta";
 import Settings from "./Settings";
 import { storage } from "@vendetta/plugin";
 import { decryptMessage } from "./util/encrypt";
+import { before } from "@vendetta/patcher";
+import { findByProps } from "@vendetta/metro";
+
+const Messages = findByProps("sendMessage", "recieveMessage");
 
 const unload = [
   patcher.before("dispatch", metro.common.FluxDispatcher, ([e]) => {
@@ -18,12 +22,12 @@ const unload = [
           m.content = decryptMessage(m.content);
         });
         return [e];
-
-      // Encrypt sent messages
-      case "sendMessage":
-        logger.info(e)
     }
     if (storage.debug) logger.info(e);
+  }),
+  // Encrypt sent messages
+  before("sendMessage", Messages, (args) => {
+    console.log("test")
   }),
 ];
 

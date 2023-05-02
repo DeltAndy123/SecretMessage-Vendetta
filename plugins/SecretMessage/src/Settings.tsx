@@ -31,7 +31,7 @@ export default () => {
         label="Enable encryption"
         subLabel="Messages that you send will be encrypted."
         trailing={<FormSwitch
-          value={storage.enable_encryption ?? true}
+          value={storage.enable_encryption ?? false}
           onValueChange={(value: boolean) => storage.enable_encryption = value}
         />}
       />
