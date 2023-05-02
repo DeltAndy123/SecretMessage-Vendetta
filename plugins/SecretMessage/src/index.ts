@@ -4,7 +4,7 @@ import { storage } from "@vendetta/plugin";
 import { decryptMessage } from "./util/encrypt";
 import { findByProps } from "@vendetta/metro";
 
-const Messages = findByProps("sendMessage", "recieveMessage");
+const Messages = findByProps("sendMessage", "receiveMessage");
 
 const unload = [
   patcher.before("dispatch", metro.common.FluxDispatcher, ([e]) => {
