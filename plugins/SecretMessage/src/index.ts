@@ -36,9 +36,11 @@ const unload = [
     }
   }),
   patcher.before("startEditMessage", Messages, ([,,content]) => {
-    if (storage.enable_encryption) {
-      // Remove suffix (<key**>) from message when editing
+    // Remove suffix (<key**>) from message when editing
+    try {
       content = content.replace(getSuffixRegex(storage.key), "");
+    } catch (e) {
+      logger.error(e);
     }
   }),
 ];
