@@ -12,15 +12,15 @@ const unload = [
       // Decrypt received messages
       case "MESSAGE_CREATE":
         e.message.content = decryptMessage(e.message.content);
-        return [e];
+      break;
       case "MESSAGE_UPDATE":
         e.message.content = decryptMessage(e.message.content);
-        return [e];
+      break;
       case "LOAD_MESSAGES_SUCCESS":
         e.messages.forEach((m) => {
           m.content = decryptMessage(m.content);
         });
-        return [e];
+      break;
     }
     if (storage.debug) logger.info(e);
   }),
@@ -35,11 +35,11 @@ const unload = [
       msg.content = encryptMessage(msg.content);
     }
   }),
-  patcher.before("startEditMessage", Messages, ([,content]) => {
+  patcher.before("startEditMessage", Messages, (args) => {
     if (storage.enable_encryption) {
       // Remove suffix (<key**>) from message when editing
       // content = content.replace(getSuffixRegex(storage.key), "");
-      console.log(content);
+      console.log(args);
     }
   }),
 ];
