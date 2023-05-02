@@ -34,6 +34,14 @@ export default () => (
       onValueChange={(value) => storage.shorten_text = value}
     />}
   />
+  <FormRow
+    label="Debug Mode"
+    subLabel="Log debug messages to console."
+    trailing={<FormSwitch
+      value={storage.debug}
+      onValueChange={(value) => storage.debug = value}
+    />}
+  />
 </ScrollView>
 
 );

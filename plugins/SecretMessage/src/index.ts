@@ -18,10 +18,12 @@ const unload = [
         });
         return [e];
     }
+    if (storage.debug) logger.info(e);
   }),
 ];
 
 export function onUnload() {
+  if (storage.debug) logger.info("Unloading SecretMessage");
   unload.forEach((u) => u());
 }
 export const settings = Settings;
