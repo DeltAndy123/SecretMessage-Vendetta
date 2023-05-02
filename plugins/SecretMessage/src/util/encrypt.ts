@@ -27,6 +27,10 @@ function getSuffix(key) {
     return `\`<${key.slice(0, 2)}${'*'.repeat(Math.max(key.length - 2, 0))}>\`` // 末尾につける現在のキーを確認するための文字列
 }
 
+function getSuffixRegex(key) {
+    return new RegExp(` \`<${key.slice(0, 2)}${'\\*'.repeat(Math.max(key.length - 2, 0))}>\`$`)
+}
+
 function sounyuu(moziretu, basyo, sounyuu) {
     const senntou = moziretu.slice(0, basyo) // slice(a,b) -> [a:b-1]
     const matubi = moziretu.slice(basyo)
@@ -109,4 +113,4 @@ function angouKaigyou(text) {
     return storage.shorten_text ? text.replaceAll("\x0B", "\u2002").replaceAll("\x0C", "\u2003").replaceAll("\r", "\u2004").replaceAll("\n", "\u2001") : text
 }
 
-export {e, decryptMessage, encryptMessage, getSikibetu, getSuffix}
+export {e, decryptMessage, encryptMessage, getSikibetu, getSuffix, getSuffixRegex}
