@@ -2,14 +2,39 @@ import { logger, metro, patcher } from "@vendetta";
 import Settings from "./Settings";
 import { storage } from "@vendetta/plugin";
 import { decryptMessage, encryptMessage, getSuffixRegex } from "./util/encrypt";
-import { findByDisplayName, findByProps } from "@vendetta/metro";
+import { findByProps } from "@vendetta/metro";
 import { registerCommand } from "@vendetta/commands";
 import { toasts } from "@vendetta/ui";
 
-const Messages = findByProps("sendMessage", "receiveMessage");
-const Pressable = findByDisplayName("Pressable");
+enum ApplicationCommandOptionType {
+  SUB_COMMAND = 1,
+  SUB_COMMAND_GROUP,
+  STRING,
+  INTEGER,
+  BOOLEAN,
+  USER6,
+  CHANNEL,
+  ROLE,
+  MENTIONABLE,
+  NUMBER,
+  ATTACHMENT
+}
 
-let giftButtonID = null
+enum ApplicationCommandInputType {
+  BUILT_IN,
+  BUILT_IN_TEXT,
+  BUILT_IN_INTEGRATION,
+  BOT,
+  PLACEHOLDER
+}
+
+enum ApplicationCommandType {
+  CHAT = 1,
+  USER,
+  MESSAGE
+}
+
+const Messages = findByProps("sendMessage", "receiveMessage");
 
 const unload = [
   patcher.before("dispatch", metro.common.FluxDispatcher, ([e]) => {
@@ -59,13 +84,13 @@ const unload = [
         displayName: "enable",
         description: "Enable SecretMessage (If not specified, it will be toggled)",
         displayDescription: "Enable SecretMessage (If not specified, it will be toggled)",
-        type: ApplicationCommandOptionType.BOOLEAN,
+        type: ApplicationCommandOptionType.BOOLEAN as number,
         required: false,
       }
     ],
     applicationId: "",
-    inputType: ApplicationCommandInputType.BUILT_IN_TEXT,
-    type: ApplicationCommandType.CHAT,
+    inputType: ApplicationCommandInputType.BUILT_IN_TEXT as number,
+    type: ApplicationCommandType.CHAT as number,
 
     execute: (args, ctx) => {
       if (args[0].value) {
