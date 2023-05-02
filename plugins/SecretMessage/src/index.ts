@@ -1,7 +1,7 @@
 import { logger, metro, patcher } from "@vendetta";
 import Settings from "./Settings";
 import { storage } from "@vendetta/plugin";
-import { decryptMessage, encryptMessage, getSuffix } from "./util/encrypt";
+import { decryptMessage, encryptMessage, getSuffixRegex } from "./util/encrypt";
 import { findByProps } from "@vendetta/metro";
 
 const Messages = findByProps("sendMessage", "receiveMessage");
@@ -37,11 +37,7 @@ const unload = [
   }),
   patcher.before("startEditMessage", Messages, ([,,content]) => {
     // Remove suffix (<key**>) from message when editing
-    try {
-      content = content.replace(getSuffixRegex(storage.key), "");
-    } catch (e) {
-      logger.error(e);
-    }
+    content = content.replace(getSuffixRegex(storage.key), "");
   }),
 ];
 
@@ -50,7 +46,3 @@ export function onUnload() {
   unload.forEach((u) => u());
 }
 export const settings = Settings;
-function getSuffixRegex(key: any): any {
-  throw new Error("Function not implemented.");
-}
-
