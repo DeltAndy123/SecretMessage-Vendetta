@@ -1,7 +1,7 @@
 import { logger, metro, patcher } from "@vendetta";
 import Settings from "./Settings";
 import { storage } from "@vendetta/plugin";
-import { decryptMessage } from "./util/encrypt";
+import { decryptMessage, encryptMessage, getSuffix } from "./util/encrypt";
 import { findByProps } from "@vendetta/metro";
 
 const Messages = findByProps("sendMessage", "receiveMessage");
@@ -25,8 +25,21 @@ const unload = [
     if (storage.debug) logger.info(e);
   }),
   // Encrypt sent messages
-  patcher.before("sendMessage", Messages, (args) => {
-    console.log(args)
+  patcher.before("sendMessage", Messages, ([,msg]) => {
+    if (storage.enable_encryption) {
+      msg.content = encryptMessage(msg.content);
+    }
+  }),
+  patcher.before("editMessage", Messages, ([,msg]) => {
+    if (storage.enable_encryption) {
+      msg.content = encryptMessage(msg.content);
+    }
+  }),
+  patcher.before("startEditMessage", Messages, ([,msg]) => {
+    if (storage.enable_encryption) {
+      // Remove suffix (<key**>) from message when editing
+      msg.content = msg.content.replace(new RegExp(`${getSuffix(storage.key)}$`), "")
+    }
   }),
 ];
 
