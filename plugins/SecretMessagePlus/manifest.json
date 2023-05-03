@@ -1,0 +1,14 @@
+{
+  "name": "SecretMessagePlus",
+  "description": "Send messages that only people with the key can read",
+  "authors": [
+    {
+      "name": "DeltAndy",
+      "id": "725826614478372875"
+    }
+  ],
+  "main": "src/index.ts",
+  "vendetta": {
+    "icon": "ic_lock"
+  }
+}
