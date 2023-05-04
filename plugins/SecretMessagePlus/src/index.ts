@@ -1,10 +1,11 @@
 import { logger, metro, patcher } from "@vendetta";
-import Settings from "./Settings";
 import { storage } from "@vendetta/plugin";
 import { decryptMessage, encryptMessage, getSuffixRegex } from "./util/encrypt";
 import { findByProps } from "@vendetta/metro";
 import { registerCommand } from "@vendetta/commands";
 import { toasts } from "@vendetta/ui";
+import { generateSettingsPage } from "./util/settings";
+import settingsJson from "./settings";
 
 enum ApplicationCommandOptionType {
   SUB_COMMAND = 1,
@@ -36,7 +37,7 @@ enum ApplicationCommandType {
 
 const Messages = findByProps("sendMessage", "receiveMessage");
 
-const unload = [
+const patches = [
   patcher.before("dispatch", metro.common.FluxDispatcher, ([e]) => {
     switch (e.type) {
       // Decrypt received messages
@@ -109,6 +110,7 @@ const unload = [
 
 export function onUnload() {
   if (storage.debug) logger.info("Unloading SecretMessage");
-  unload.forEach((u) => u());
+  patches.forEach((unload) => unload());
 }
-export const settings = Settings;
+
+export const settings = () => generateSettingsPage(settingsJson, storage);

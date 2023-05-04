@@ -1,3 +1,5 @@
+import { MenuOption, SettingsComponent } from "./util/types"
+
 const encryptionMethods: MenuOption[] = [
   {
     label: "Legacy",
@@ -18,6 +20,11 @@ const encryptionMethods: MenuOption[] = [
 
 
 export default [
+  {
+    type: "title",
+    label: "SecretMessagePlus",
+    description: "A plugin to encrypt your messages in many ways",
+  },
   {
     type: "switch",
     label: "Enable encryption",
