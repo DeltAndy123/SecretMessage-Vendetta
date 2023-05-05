@@ -41,13 +41,16 @@ const unload = [
     switch (e.type) {
       // Decrypt received messages
       case "MESSAGE_CREATE":
+        if (!e.message.content) return;
         e.message.content = decryptMessage(e.message.content);
       break;
       case "MESSAGE_UPDATE":
+        if (!e.message.content) return;
         e.message.content = decryptMessage(e.message.content);
       break;
       case "LOAD_MESSAGES_SUCCESS":
         e.messages.forEach((m) => {
+          if (!e.message.content) return;
           m.content = decryptMessage(m.content);
         });
       break;

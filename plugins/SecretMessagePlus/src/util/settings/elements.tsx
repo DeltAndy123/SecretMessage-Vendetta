@@ -1,6 +1,7 @@
 import { constants, stylesheet } from "@vendetta/metro/common";
 import { semanticColors } from "@vendetta/ui";
 import { General } from "@vendetta/ui/components";
+import { elements as elementStyles } from "./styles";
 const { View, Text } = General;
 
 const styles = stylesheet.createThemedStyleSheet({
@@ -28,9 +29,9 @@ const styles = stylesheet.createThemedStyleSheet({
 export const Section = ({ label, description, children }: { label?: string, description?: string, children: JSX.Element | JSX.Element[] }) => {
   return (
     <View style={{ marginTop: 10 }}>
-      <Text style={{...styles.sectionLabel}}>{label}</Text>
+      <Text style={{...elementStyles.sectionLabel}}>{label}</Text>
       {children}
-      <Text style={{...styles.sectionDescription}}>{description}</Text>
+      <Text style={{...elementStyles.sectionDescription}}>{description}</Text>
     </View>
   )
 };

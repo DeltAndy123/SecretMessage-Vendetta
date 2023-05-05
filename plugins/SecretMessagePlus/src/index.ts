@@ -46,13 +46,16 @@ const patches = [
     switch (e.type) {
       // Decrypt received messages
       case "MESSAGE_CREATE":
+        if (!e.message.content) return;
         e.message.content = decryptMessage(e.message.content, storage.key, storage.decryption_methods);
       break;
       case "MESSAGE_UPDATE":
+        if (!e.message.content) return;
         e.message.content = decryptMessage(e.message.content, storage.key, storage.decryption_methods);
       break;
       case "LOAD_MESSAGES_SUCCESS":
         e.messages.forEach((m: { content: string; }) => {
+          if (!m.content) return;
           m.content = decryptMessage(m.content, storage.key, storage.decryption_methods);
         });
       break;
