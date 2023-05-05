@@ -1,34 +1,45 @@
 import { React, ReactNative, NavigationNative } from "@vendetta/metro/common";
-import { Forms } from "@vendetta/ui/components";
+import { Forms, General } from "@vendetta/ui/components";
 import { storage as st } from "@vendetta/plugin";
 import { useProxy } from "@vendetta/storage";
 import { SettingsComponent, isJSXElement } from "../types";
+import styles from "./styles";
+import { semanticColors } from "@vendetta/ui";
+import { Section } from "./elements";
 const { FormRow, FormInput, FormSwitch, FormSection, FormDivider, FormRadioRow } = Forms;
 const { ScrollView } = ReactNative;
+const { Text, View } = General;
 
 
-
-export function generateSettingsPage(settings: (SettingsComponent | JSX.Element)[], storage: typeof st): JSX.Element {
+export function generateSettingsPage(settings: (SettingsComponent | JSX.Element)[], storage: typeof st, separator?: any): JSX.Element {
   useProxy(storage)
   const navigation = NavigationNative.useNavigation()
-  return (<ScrollView>{
-    settings.map((setting) => {
-      if (isJSXElement(setting)) return setting
-      switch (setting.type) {
-        case "switch":
-          return (
-            <FormRow
-              label={setting.label}
-              subLabel={setting.description}
-              trailing={<FormSwitch
-                value={storage[setting.key] ?? setting.default}
-                onValueChange={(value: boolean) => storage[setting.key] = value}
-              />}
-            />
-          );
-        case "radio":
-          return (
-            <FormSection title={setting.label}>
+  var elements = settings.map((setting) => {
+    if (isJSXElement(setting)) return setting
+    switch (setting.type) {
+      case "group":
+        return (
+          <Section label={setting.title} description={setting.description}>
+            <View style={{...styles.group}}>
+              {generateSettingsPage(setting.components, storage, <FormDivider/>)}
+            </View>
+          </Section>
+        );
+      case "switch":
+        return (
+          <FormRow
+            label={setting.label}
+            subLabel={setting.description}
+            trailing={<FormSwitch
+              value={storage[setting.key] ?? setting.default}
+              onValueChange={(value: boolean) => storage[setting.key] = value}
+            />}
+          />
+        );
+      case "radio":
+        return (
+          <Section label={setting.label} description={setting.description}>
+            <View style={{...styles.group}}>
               <ReactNative.FlatList
                 data={setting.choices}
                 ItemSeparatorComponent={FormDivider}
@@ -45,11 +56,13 @@ export function generateSettingsPage(settings: (SettingsComponent | JSX.Element)
                   )
                 }}
               />
-            </FormSection>
-          );
-        case "checklist":
-          return (
-            <FormSection title={setting.label}>
+            </View>
+          </Section>
+        );
+      case "checklist":
+        return (
+          <Section label={setting.label} description={setting.description}>
+            <View style={{...styles.group}}>
               <ReactNative.FlatList
                 data={setting.choices}
                 ItemSeparatorComponent={FormDivider}
@@ -71,55 +84,54 @@ export function generateSettingsPage(settings: (SettingsComponent | JSX.Element)
                   )
                 }}
               />
-            </FormSection>
-          )
-        case "input":
-          return (
-            <FormInput
-              title={setting.label}
-              value={storage[setting.key] ?? setting.default}
-              onSubmitEditing={(e) => storage[setting.key] = e.nativeEvent.text}
-              placeholder={setting.description}
-              returnKeyType="done"
-              secureTextEntry={setting.secure}
-              multiline={setting.lines > 1}
-              numberOfLines={setting.lines || 1}
-            />
-          );
-        case "button":
-          return (
-            <FormRow
-              label={setting.label}
-              subLabel={setting.description}
-              onPress={() => {
-                setting.onclick();
-              }}
-            />
-          );
-        case "page":
-          return (
-            <FormRow
-              label={setting.label}
-              subLabel={setting.description}
-              trailing={<FormRow.Arrow/>}
-              onPress={() => navigation.push("VendettaCustomPage", {
-                title: setting.label,
-                render: () => {
-                  return generateSettingsPage(setting.components, storage);
-                }
-              })}
-            />
-          );
-        case "title":
-          return (
-            <FormSection
-              title={setting.label}
-              description={setting.description}
-            />
-          );
-        default:
-          return null;
-      }
-    })
-  }</ScrollView>)
+            </View>
+          </Section>
+        );
+      case "input":
+        return (
+          <FormInput
+            value={storage[setting.key] ?? setting.default}
+            onChangeText={(text: string) => storage[setting.key] = text}
+            title={setting.label}
+            placeholder={setting.description}
+            secureTextEntry={setting.protected}
+            multiline={setting.multiline}
+            numberOfLines={setting.lines}
+          />
+        );
+      case "button":
+        return (
+          <FormRow
+            label={setting.label}
+            subLabel={setting.description}
+            onPress={() => {
+              setting.onclick();
+            }
+          }/>
+        );
+      case "page":
+        return (
+          <FormRow
+            label={setting.label}
+            subLabel={setting.description}
+            trailing={<FormRow.Arrow/>}
+            onPress={() => navigation.push("VendettaCustomPage", {
+              title: setting.label,
+              render: () => {
+                return generateSettingsPage(setting.components, storage);
+              }
+            })}
+          />
+        );
+      default:
+        return null;
+    }
+  })
+  if (separator) {
+    elements = elements.reduce((acc, el) => {
+      if (acc.length === 0) return [el];
+      return [...acc, separator, el];
+    }, [])
+  }
+  return (<ScrollView>{elements}</ScrollView>);
 }

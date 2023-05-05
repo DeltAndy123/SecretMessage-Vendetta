@@ -4,11 +4,9 @@ import { semanticColors } from "@vendetta/ui";
 export default stylesheet.createThemedStyleSheet({
   group: {
     width: "90%",
-    margin: "auto",
+    marginLeft: "5%",
     borderRadius: 10,
-    backgroundColor: semanticColors.BACKGROUND_SECONDARY,
-    borderWidth: 1,
-    borderColor: semanticColors.BORDER,
-    
+    backgroundColor: semanticColors.BACKGROUND_MOBILE_SECONDARY,
+    overflow: "hidden",
   }
 });

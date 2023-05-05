@@ -15,6 +15,13 @@ interface BaseConfigSettingsComponent extends BaseSettingsComponent {
   key: string;
 }
 
+interface GroupSettingsComponent extends BaseSettingsComponent {
+  type: "group";
+  title: string;
+  description?: string;
+  components: SettingsComponent[];
+}
+
 interface SwitchSettingsComponent extends BaseConfigSettingsComponent {
   type: "switch";
   default: boolean;
@@ -37,7 +44,7 @@ interface InputSettingsComponent extends BaseConfigSettingsComponent {
   multiline?: boolean;
   lines?: number;
   default: string;
-  secure?: boolean;
+  protected?: boolean;
 }
 
 interface ButtonSettingsComponent extends BaseConfigSettingsComponent {
@@ -55,6 +62,7 @@ interface TitleSettingsComponent extends BaseSettingsComponent {
 }
 
 type SettingsComponent =
+  | GroupSettingsComponent
   | SwitchSettingsComponent
   | RadioSettingsComponent
   | ChecklistSettingsComponent
@@ -67,4 +75,6 @@ function isJSXElement(element: any): element is JSX.Element {
   return "type" in element && "props" in element;
 }
 
-export { SettingsComponent, MenuOption, isJSXElement };
+type EncryptionMethods = "legacy" | "aes-128" | "rsa";
+
+export { SettingsComponent, MenuOption, isJSXElement, EncryptionMethods };

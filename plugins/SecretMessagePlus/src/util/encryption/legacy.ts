@@ -53,9 +53,7 @@ function kakoi() {
     return aruaruNaMozitati[ransuuSeisei(0, aruaruNaMozitati.length - 1)]
 }
 
-function encryptMessage(text) {
-    // let key = get(name, "key")
-    let key = storage.key
+function encryptMessage(text: string, key: string) {
     let encrypted = angouKaigyou(e(text, key))
     let kankaku = Math.floor(encrypted.length / 3)
     let sikibetu = getSikibetu(key)
@@ -90,9 +88,7 @@ function hukugoukaSubekika(naiyou, sikibetu) {
     return false
 }
 
-function decryptMessage(text) {
-    // let key = get(name, "key")
-    let key = storage.key
+function decryptMessage(text: string, key: string) {
     let sikibetu = getSikibetu(key)
     let suffix = getSuffix(key)
     let mozi = hukugoukaSubekika(text, sikibetu)
