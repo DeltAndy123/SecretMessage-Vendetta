@@ -3,11 +3,10 @@ import { storage } from "@vendetta/plugin";
 import { encryptMessage, decryptMessage } from "./util/encryption";
 import { findByProps } from "@vendetta/metro";
 import { registerCommand } from "@vendetta/commands";
-import { toasts } from "@vendetta/ui";
-import { generateSettingsPage } from "./util/settings";
+import { generateSettingsPage, setDefaults } from "./util/settings";
 import settingsJson from "./settings";
 import { AES } from "crypto-js";
-import NodeRSA from "node-rsa";
+import { getSuffixRegex } from "./util/encryption/legacy";
 
 enum ApplicationCommandOptionType {
   SUB_COMMAND = 1,
@@ -37,12 +36,14 @@ enum ApplicationCommandType {
   MESSAGE
 }
 
+if (!storage.settings) storage.settings = setDefaults(storage, settingsJson);
+
 const Messages = findByProps("sendMessage", "receiveMessage");
 const { sendBotMessage } = findByProps("sendBotMessage");
 
 const patches = [
   patcher.before("dispatch", metro.common.FluxDispatcher, ([e]) => {
-    if (!storage.enable_decryption) return;
+    if (!storage.settings.enable_decryption) return;
     switch (e.type) {
       // Decrypt received messages
       case "MESSAGE_CREATE":
@@ -51,7 +52,7 @@ const patches = [
           legacy: storage.settings.legacy_key,
           rsa: storage.settings.rsa_private,
           aes128: storage.settings.aes_key
-        }, storage.decryption_methods);
+        }, storage.settings.decryption_methods);
       break;
       case "MESSAGE_UPDATE":
         if (!e.message.content) return;
@@ -59,7 +60,7 @@ const patches = [
           legacy: storage.settings.legacy_key,
           rsa: storage.settings.rsa_private,
           aes128: storage.settings.aes_key
-        }, storage.decryption_methods);
+        }, storage.settings.decryption_methods);
       break;
       case "LOAD_MESSAGES_SUCCESS":
         e.messages.forEach((m: { content: string; }) => {
@@ -68,29 +69,49 @@ const patches = [
             legacy: storage.settings.legacy_key,
             rsa: storage.settings.rsa_private,
             aes128: storage.settings.aes_key
-          }, storage.decryption_methods);
+          }, storage.settings.decryption_methods);
         });
       break;
     }
-    if (storage.debug) logger.info(e);
+    if (storage.settings.debug) logger.info(e);
   }),
 
-  // // Encrypt sent messages
-  // patcher.before("sendMessage", Messages, ([,msg]) => {
-  //   if (storage.enable_encryption) {
-  //     msg.content = encryptMessage(msg.content);
-  //   }
-  // }),
-  // patcher.before("editMessage", Messages, ([,msg]) => {
-  //   if (storage.enable_encryption) {
-  //     msg.content = encryptMessage(msg.content);
-  //   }
-  // }),
-  // patcher.before("startEditMessage", Messages, ([,,content]) => {
-  //   // Remove suffix (<key**>) from message when editing
-  //   // TODO: Fix not replacing the message starting to edit
-  //   content = content.replace(getSuffixRegex(storage.key), "");
-  // }),
+  // Encrypt sent messages
+  patcher.before("sendMessage", Messages, ([,msg]) => {
+    if (storage.enable_encryption) {
+      switch (storage.settings.encryption_method) {
+        case "legacy":
+          msg.content = encryptMessage(msg.content, storage.settings.legacy_key, "legacy");
+        break;
+        case "rsa":
+          msg.content = encryptMessage(msg.content, storage.settings.rsa_public, "rsa");
+        break;
+        case "aes-128":
+          msg.content = encryptMessage(msg.content, storage.settings.aes_key, "aes-128");
+        break;
+      }
+    }
+  }),
+  patcher.before("editMessage", Messages, ([,msg]) => {
+    if (storage.enable_encryption) {
+      switch (storage.settings.encryption_method) {
+        case "legacy":
+          msg.content = encryptMessage(msg.content, storage.settings.legacy_key, "legacy");
+        break;
+        case "rsa":
+          msg.content = encryptMessage(msg.content, storage.settings.rsa_public, "rsa");
+        break;
+        case "aes-128":
+          msg.content = encryptMessage(msg.content, storage.settings.aes_key, "aes-128");
+        break;
+      }
+    }
+  }),
+  patcher.before("startEditMessage", Messages, ([,,content]) => {
+    // Remove suffix (<key**>) from message when editing
+    // TODO: Fix not replacing the message starting to edit
+    content = content.replace(getSuffixRegex(storage.key), "");
+  }),
 
   // // Slash commands
   // registerCommand({
@@ -125,24 +146,10 @@ const patches = [
   //     }
   //   }
   // })
-  registerCommand({
-    name: "test",
-    displayName: "test",
-    description: "test",
-    displayDescription: "test",
-    options: [],
-    applicationId: "",
-    inputType: ApplicationCommandInputType.BUILT_IN_TEXT as number,
-    type: ApplicationCommandType.CHAT as number,
-
-    execute: (args, ctx) => {
-      sendBotMessage(ctx.channel.id, AES.encrypt("test", "test", {}).toString());
-    }
-  })
 ];
 
 export function onUnload() {
-  if (storage.debug) logger.info("Unloading SecretMessage");
+  if (storage.settings.debug) logger.info("Unloading SecretMessage");
   patches.forEach((unload) => unload());
 }
 

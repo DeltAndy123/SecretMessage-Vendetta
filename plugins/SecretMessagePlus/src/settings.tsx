@@ -23,7 +23,7 @@ const encryptionMethods: MenuOption[] = [
 export default [
   {
     type: "group",
-    title: "Encryption",
+    title: "General",
     components: [
       {
         type: "switch",
@@ -35,9 +35,18 @@ export default [
         type: "switch",
         label: "Enable decryption",
         description: "Messages that you receive will be decrypted in your selected method.",
-        key: "enable_decryption"
+        key: "enable_decryption",
+        default: true
+      },
+      {
+        type: "input",
+        label: "Decrypted message template",
+        description: "The template used to display decrypted messages.",
+        key: "decrypted_message_template",
+        default: "{{MESSAGE}} [{{METHOD}} ({{KEY}})]"
       }
-    ]
+    ],
+    description: "Valid placeholders: {{MESSAGE}}, {{METHOD}}, {{KEY}} (KEY will be censored)"
   },
   {
     type: "radio",
@@ -111,6 +120,20 @@ export default [
         description: "The key to encrypt and decrypt messages using the legacy method",
         key: "legacy_key",
         protected: true
+      },
+      {
+        type: "switch",
+        label: "Auto shorten text",
+        description: "Shorten encrypted text by replacing specific char. Can be detected by AutoMod.",
+        key: "shorten_text",
+        default: true
+      },
+      {
+        type: "switch",
+        label: "Spoof key length",
+        description: "Always make the key length shown as 5 characters long when decrypted messages are shown. (Example: if key is 123456789, it will be shown as 12*** instead of 12*******)",
+        key: "spoof_key_length",
+        default: true
       }
     ]
   }

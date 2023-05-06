@@ -17,8 +17,13 @@ function getSikibetu(key) {
     return `${e("secret", key).slice(0, 3).padStart(3, '?')}` // 3桁の認識キーを生成
 }
 
-function getSuffix(key) {
-    return `\`<${key.slice(0, 2)}${'*'.repeat(Math.max(key.length - 2, 0))}>\`` // 末尾につける現在のキーを確認するための文字列
+function censorKey(key: string, hideLength?: boolean) {
+    // return `${key.slice(0, 2)}${'*'.repeat(Math.max(key.length - 2, 0))}` // 末尾につける現在のキーを確認するための文字列
+    if (hideLength) {
+        return `${key.slice(0, 2)}***`
+    } else {
+        return `${key.slice(0, 2)}${'*'.repeat(Math.max(key.length - 2, 0))}`
+    }
 }
 
 function getSuffixRegex(key) {
@@ -82,16 +87,23 @@ function hukugoukaSubekika(naiyou, sikibetu) {
     return false
 }
 
-function decryptMessage(text: string, key: string) {
+function decryptMessage(text: string, key: string): { wasEncrypted: boolean, text: string, key?: string } {
+    // let sikibetu = getSikibetu(key)
+    // let suffix = getSuffix(key)
+    // let mozi = hukugoukaSubekika(text, sikibetu)
+    // if (mozi) {
+    //     let decrypted = e(hukugouKaigyou(mozi), key)
+    //     return `${decrypted} ${suffix}`
+    // } else {
+    //     return text
+    // }
     let sikibetu = getSikibetu(key)
-    let suffix = getSuffix(key)
     let mozi = hukugoukaSubekika(text, sikibetu)
     if (mozi) {
-        let decrypted = e(hukugouKaigyou(mozi), key)
-        return `${decrypted} ${suffix}`
-    } else {
-        return text
+        let decrypted = e(angouKaigyou(mozi), key)
+        return { wasEncrypted: true, text: decrypted }
     }
+    return { wasEncrypted: false, text }
 }
 
 function hukugouKaigyou(text) { // replace with spaces commonly used
@@ -103,4 +115,4 @@ function angouKaigyou(text) {
     return text.replaceAll("\x0B", "\u2002").replaceAll("\x0C", "\u2003").replaceAll("\r", "\u2004").replaceAll("\n", "\u2001")
 }
 
-export {e, decryptMessage, encryptMessage, getSikibetu, getSuffix, getSuffixRegex}
+export {e, decryptMessage, encryptMessage, getSikibetu, censorKey, getSuffixRegex}

@@ -75,6 +75,12 @@ function isJSXElement(element: any): element is JSX.Element {
   return "type" in element && "props" in element;
 }
 
+function isConfigSettingsComponent(
+  component: any
+): component is BaseConfigSettingsComponent {
+  return "key" in component;
+}
+
 type EncryptionMethods = "legacy" | "aes-128" | "rsa";
 
-export { SettingsComponent, MenuOption, isJSXElement, EncryptionMethods };
+export { SettingsComponent, MenuOption, isJSXElement, isConfigSettingsComponent, EncryptionMethods };

@@ -2,7 +2,7 @@ import { React, ReactNative, NavigationNative } from "@vendetta/metro/common";
 import { Forms, General } from "@vendetta/ui/components";
 import { storage as st } from "@vendetta/plugin";
 import { useProxy } from "@vendetta/storage";
-import { SettingsComponent, isJSXElement } from "../types";
+import { SettingsComponent, isConfigSettingsComponent, isJSXElement } from "../types";
 import { general } from "./styles";
 import { Section } from "./elements";
 const {
@@ -35,7 +35,7 @@ export function generateSettingsPage(
             <View style={{ ...general.group }}>
               {generateSettingsPage(
                 setting.components,
-                storage.settings,
+                storage,
                 <FormDivider />
               )}
             </View>
@@ -144,7 +144,7 @@ export function generateSettingsPage(
               navigation.push("VendettaCustomPage", {
                 title: setting.label,
                 render: () => {
-                  return generateSettingsPage(setting.components, storage.settings);
+                  return generateSettingsPage(setting.components, storage);
                 },
               })
             }
@@ -176,4 +176,15 @@ export function generateSettingsPage(
       </ScrollView>
     </KeyboardAvoidingView>
   );
+}
+
+export function setDefaults(storage: typeof st, settings: SettingsComponent[]) {
+  settings.forEach((setting) => {
+    if (isJSXElement(setting)) return;
+    if (!isConfigSettingsComponent(setting)) return;
+    if (!setting.default) return;
+    if (!storage.settings) storage.settings = {};
+    
+    storage.settings[setting.key] = setting.default;
+  });
 }
