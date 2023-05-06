@@ -36,13 +36,14 @@ enum ApplicationCommandType {
   MESSAGE
 }
 
-if (!storage.settings) storage.settings = setDefaults(storage, settingsJson);
+if (!storage.settings) storage.settings = setDefaults({}, settingsJson);
 
 const Messages = findByProps("sendMessage", "receiveMessage");
 const { sendBotMessage } = findByProps("sendBotMessage");
 
 const patches = [
   patcher.before("dispatch", metro.common.FluxDispatcher, ([e]) => {
+    if (!storage.settings) return
     if (!storage.settings.enable_decryption) return;
     switch (e.type) {
       // Decrypt received messages
@@ -78,7 +79,7 @@ const patches = [
 
   // Encrypt sent messages
   patcher.before("sendMessage", Messages, ([,msg]) => {
-    if (storage.enable_encryption) {
+    if (storage.settings.enable_encryption) {
       switch (storage.settings.encryption_method) {
         case "legacy":
           msg.content = encryptMessage(msg.content, storage.settings.legacy_key, "legacy");
@@ -93,7 +94,7 @@ const patches = [
     }
   }),
   patcher.before("editMessage", Messages, ([,msg]) => {
-    if (storage.enable_encryption) {
+    if (storage.settings.enable_encryption) {
       switch (storage.settings.encryption_method) {
         case "legacy":
           msg.content = encryptMessage(msg.content, storage.settings.legacy_key, "legacy");
@@ -110,7 +111,7 @@ const patches = [
   patcher.before("startEditMessage", Messages, ([,,content]) => {
     // Remove suffix (<key**>) from message when editing
     // TODO: Fix not replacing the message starting to edit
-    content = content.replace(getSuffixRegex(storage.key), "");
+    content = content.replace(getSuffixRegex(storage.settings.key), "");
   }),
 
   // // Slash commands
@@ -135,17 +136,30 @@ const patches = [
 
   //   execute: (args, ctx) => {
   //     if (args[0].value) {
-  //       storage.enable_encryption = true;
+  //       storage.settings.enable_encryption = true;
   //       toasts.showToast("Encrypting messages enabled");
   //     } else if (args[0].value === false) {
-  //       storage.enable_encryption = false;
+  //       storage.settings.enable_encryption = false;
   //       toasts.showToast("Encrypting messages disabled");
   //     } else {
-  //       storage.enable_encryption = !storage.enable_encryption;
-  //       toasts.showToast(`Encrypting messages ${storage.enable_encryption ? "enabled" : "disabled"}`);
+  //       storage.settings.enable_encryption = !storage.settings.enable_encryption;
+  //       toasts.showToast(`Encrypting messages ${storage.settings.enable_encryption ? "enabled" : "disabled"}`);
   //     }
   //   }
   // })
+  registerCommand({
+    name: 'test',
+    displayName: 'test',
+    description: 'test',
+    displayDescription: 'test',
+    options: [],
+    applicationId: '',
+    inputType: ApplicationCommandInputType.BUILT_IN_TEXT as number,
+    type: ApplicationCommandType.CHAT as number,
+    execute: (args, ctx) => {
+      sendBotMessage(ctx.channel.id, JSON.stringify(storage.settings, null, 2));
+    }
+  })
 ];
 
 export function onUnload() {

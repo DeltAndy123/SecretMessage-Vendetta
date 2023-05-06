@@ -178,13 +178,33 @@ export function generateSettingsPage(
   );
 }
 
-export function setDefaults(storage: typeof st, settings: SettingsComponent[]) {
-  settings.forEach((setting) => {
+export function setDefaults(currentSettings: {[key: string]: any}, settings: SettingsComponent[]) {
+  const forFunc = (setting: SettingsComponent) => {
     if (isJSXElement(setting)) return;
+    if (setting.type === "group") return setting.components.forEach(forFunc);
     if (!isConfigSettingsComponent(setting)) return;
-    if (!setting.default) return;
-    if (!storage.settings) storage.settings = {};
-    
-    storage.settings[setting.key] = setting.default;
-  });
+    if (setting.default == undefined) {
+      switch (setting.type) {
+        case "button":
+          setting.default = () => {};
+        break;
+        case "checklist":
+          setting.default = [];
+        break;
+        case "input":
+          setting.default = "";
+        break;
+        case "radio":
+          setting.default = setting.choices[0].value;
+        break;
+        case "switch":
+          setting.default = false;
+        break;
+      }
+    };
+
+    currentSettings[setting.key] = setting.default;
+  }
+  settings.forEach(forFunc);
+  return currentSettings;
 }

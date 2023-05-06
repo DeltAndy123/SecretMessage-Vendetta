@@ -29,14 +29,13 @@ export default [
         type: "switch",
         label: "Enable encryption",
         description: "Messages that you send will be encrypted in your selected method.",
-        key: "enable_encryption"
+        key: "enable_encryption",
       },
       {
         type: "switch",
         label: "Enable decryption",
         description: "Messages that you receive will be decrypted in your selected method.",
         key: "enable_decryption",
-        default: true
       },
       {
         type: "input",

@@ -52,7 +52,7 @@ interface ButtonSettingsComponent extends BaseConfigSettingsComponent {
   onclick: () => void;
 }
 
-interface PageSettingsComponent extends BaseConfigSettingsComponent {
+interface PageSettingsComponent extends BaseSettingsComponent {
   type: "page";
   components: SettingsComponent[];
 }
