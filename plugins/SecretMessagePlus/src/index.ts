@@ -47,16 +47,28 @@ const patches = [
       // Decrypt received messages
       case "MESSAGE_CREATE":
         if (!e.message.content) return;
-        e.message.content = decryptMessage(e.message.content, storage.key, storage.decryption_methods);
+        e.message.content = decryptMessage(e.message.content, {
+          legacy: storage.settings.legacy_key,
+          rsa: storage.settings.rsa_private,
+          aes128: storage.settings.aes_key
+        }, storage.decryption_methods);
       break;
       case "MESSAGE_UPDATE":
         if (!e.message.content) return;
-        e.message.content = decryptMessage(e.message.content, storage.key, storage.decryption_methods);
+        e.message.content = decryptMessage(e.message.content, {
+          legacy: storage.settings.legacy_key,
+          rsa: storage.settings.rsa_private,
+          aes128: storage.settings.aes_key
+        }, storage.decryption_methods);
       break;
       case "LOAD_MESSAGES_SUCCESS":
         e.messages.forEach((m: { content: string; }) => {
           if (!m.content) return;
-          m.content = decryptMessage(m.content, storage.key, storage.decryption_methods);
+          m.content = decryptMessage(m.content, {
+            legacy: storage.settings.legacy_key,
+            rsa: storage.settings.rsa_private,
+            aes128: storage.settings.aes_key
+          }, storage.decryption_methods);
         });
       break;
     }

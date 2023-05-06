@@ -4,7 +4,7 @@ import { MenuOption, SettingsComponent } from "./util/types"
 const encryptionMethods: MenuOption[] = [
   {
     label: "Legacy",
-    description: "The legacy encryption method used by SecretMessage (both Enmity and Vendetta), backwards compatible",
+    description: "The legacy encryption method used by SecretMessage (both Enmity and Vendetta), backwards compatible (NOTE: VERY INSECURE AND NOT RECOMMENDED)",
     value: "legacy"
   },
   {
@@ -97,6 +97,19 @@ export default [
         label: "AES Key",
         description: "The key to encrypt and decrypt messages using AES",
         key: "aes_key",
+        protected: true
+      }
+    ]
+  },
+  {
+    type: "group",
+    title: "Legacy",
+    components: [
+      {
+        type: "input",
+        label: "Legacy Key",
+        description: "The key to encrypt and decrypt messages using the legacy method",
+        key: "legacy_key",
         protected: true
       }
     ]

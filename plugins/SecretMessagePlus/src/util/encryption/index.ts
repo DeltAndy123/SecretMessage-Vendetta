@@ -1,11 +1,11 @@
 import { EncryptionMethods } from "../types";
 import { encryptMessage as encryptLegacy, decryptMessage as decryptLegacy } from "./legacy";
 
-export function encryptMessage(message: string, key: string, method: EncryptionMethods): string {
+export function encryptMessage(message: string, key: { legacy?: string, rsa?: string, aes128?: string }, method: EncryptionMethods): string {
   throw new Error("Not implemented");
 }
 
-export function decryptMessage(message: string, key: string, method: EncryptionMethods | EncryptionMethods[]): string {
+export function decryptMessage(message: string, key: { legacy?: string, rsa?: string, aes128?: string }, method: EncryptionMethods | EncryptionMethods[]): string {
   if (Array.isArray(method)) {
     for (const m of method) {
       try {
@@ -14,11 +14,11 @@ export function decryptMessage(message: string, key: string, method: EncryptionM
         continue;
       }
     }
-    throw new Error("Failed to decrypt message");
+    return
   }
   switch (method) {
     case "legacy":
-      return decryptLegacy(message, key);
+      return decryptLegacy(message, key.legacy);
     case "aes-128":
       throw new Error("Not implemented");
     case "rsa":

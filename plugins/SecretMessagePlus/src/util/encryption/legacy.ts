@@ -1,12 +1,6 @@
 // Code from SecretMessage by m4fn3
 // https://github.com/m4fn3/SecretMessage/blob/master/src/utils/encryption.ts
 
-// @ts-ignore
-// import manifest, {name} from '../../manifest.json'
-// import {get} from "enmity/api/settings"
-
-import { storage } from "@vendetta/plugin"
-
 // good luck with Japanese
 
 let aruaruNaMozitati = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
@@ -53,8 +47,8 @@ function kakoi() {
     return aruaruNaMozitati[ransuuSeisei(0, aruaruNaMozitati.length - 1)]
 }
 
-function encryptMessage(text: string, key: string) {
-    let encrypted = angouKaigyou(e(text, key))
+function encryptMessage(text: string, key: string, shorten_text?: boolean) {
+    let encrypted = shorten_text ? angouKaigyou(e(text, key)) : e(text, key)
     let kankaku = Math.floor(encrypted.length / 3)
     let sikibetu = getSikibetu(key)
     if (kankaku == 0) { // ~二文字
@@ -106,7 +100,7 @@ function hukugouKaigyou(text) { // replace with spaces commonly used
 
 function angouKaigyou(text) {
     // return get(name, "shorten_text") ? text.replaceAll("\x0B", "\u2002").replaceAll("\x0C", "\u2003").replaceAll("\r", "\u2004").replaceAll("\n", "\u2001") : text
-    return storage.shorten_text ? text.replaceAll("\x0B", "\u2002").replaceAll("\x0C", "\u2003").replaceAll("\r", "\u2004").replaceAll("\n", "\u2001") : text
+    return text.replaceAll("\x0B", "\u2002").replaceAll("\x0C", "\u2003").replaceAll("\r", "\u2004").replaceAll("\n", "\u2001")
 }
 
 export {e, decryptMessage, encryptMessage, getSikibetu, getSuffix, getSuffixRegex}

@@ -35,7 +35,7 @@ export function generateSettingsPage(
             <View style={{ ...general.group }}>
               {generateSettingsPage(
                 setting.components,
-                storage,
+                storage.settings,
                 <FormDivider />
               )}
             </View>
@@ -48,9 +48,9 @@ export function generateSettingsPage(
             subLabel={setting.description}
             trailing={
               <FormSwitch
-                value={storage[setting.key] ?? setting.default}
+                value={storage.settings[setting.key] ?? setting.default}
                 onValueChange={(value: boolean) =>
-                  (storage[setting.key] = value)
+                  (storage.settings[setting.key] = value)
                 }
               />
             }
@@ -68,9 +68,9 @@ export function generateSettingsPage(
                     <FormRadioRow
                       label={item.label}
                       subLabel={item.description}
-                      selected={storage[setting.key] === item.value}
+                      selected={storage.settings[setting.key] === item.value}
                       onPress={() => {
-                        storage[setting.key] = item.value;
+                        storage.settings[setting.key] = item.value;
                       }}
                     />
                   );
@@ -87,20 +87,20 @@ export function generateSettingsPage(
                 data={setting.choices}
                 ItemSeparatorComponent={FormDivider}
                 renderItem={({ item }) => {
-                  if (!storage[setting.key]) storage[setting.key] = [];
+                  if (!storage.settings[setting.key]) storage.settings[setting.key] = [];
                   return (
                     <FormRadioRow
                       label={item.label}
                       subLabel={item.description}
-                      selected={storage[setting.key].includes(item.value)}
+                      selected={storage.settings[setting.key].includes(item.value)}
                       onPress={() => {
-                        if (storage[setting.key].includes(item.value)) {
-                          storage[setting.key] = storage[setting.key].filter(
+                        if (storage.settings[setting.key].includes(item.value)) {
+                          storage.settings[setting.key] = storage.settings[setting.key].filter(
                             (value: string) => value !== item.value
                           );
                         } else {
-                          storage[setting.key] = [
-                            ...storage[setting.key],
+                          storage.settings[setting.key] = [
+                            ...storage.settings[setting.key],
                             item.value,
                           ];
                         }
@@ -115,8 +115,8 @@ export function generateSettingsPage(
       case "input":
         return (
           <FormInput
-            value={storage[setting.key] ?? setting.default}
-            onChangeText={(text: string) => (storage[setting.key] = text)}
+            value={storage.settings[setting.key] ?? setting.default}
+            onChangeText={(text: string) => (storage.settings[setting.key] = text)}
             title={setting.label}
             placeholder={setting.description}
             secureTextEntry={setting.protected}
@@ -144,7 +144,7 @@ export function generateSettingsPage(
               navigation.push("VendettaCustomPage", {
                 title: setting.label,
                 render: () => {
-                  return generateSettingsPage(setting.components, storage);
+                  return generateSettingsPage(setting.components, storage.settings);
                 },
               })
             }
