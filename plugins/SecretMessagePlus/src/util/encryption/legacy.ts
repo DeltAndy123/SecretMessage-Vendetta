@@ -79,15 +79,6 @@ function hukugoukaSubekika(naiyou, sikibetu) {
 }
 
 function decryptMessage(text: string, key: string): { wasEncrypted: boolean, text: string, key?: string } {
-    // let sikibetu = getSikibetu(key)
-    // let suffix = getSuffix(key)
-    // let mozi = hukugoukaSubekika(text, sikibetu)
-    // if (mozi) {
-    //     let decrypted = e(hukugouKaigyou(mozi), key)
-    //     return `${decrypted} ${suffix}`
-    // } else {
-    //     return text
-    // }
     let sikibetu = getSikibetu(key)
     let mozi = hukugoukaSubekika(text, sikibetu)
     if (mozi) {

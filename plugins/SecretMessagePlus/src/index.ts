@@ -39,7 +39,6 @@ enum ApplicationCommandType {
 if (!storage.settings) storage.settings = setDefaults({}, settingsJson);
 
 const Messages = findByProps("sendMessage", "receiveMessage");
-const { sendBotMessage } = findByProps("sendBotMessage");
 
 const patches = [
   patcher.before("dispatch", metro.common.FluxDispatcher, ([e]) => {
@@ -202,19 +201,6 @@ const patches = [
   //     }
   //   }
   // })
-  registerCommand({
-    name: "test",
-    displayName: "test",
-    description: "test",
-    displayDescription: "test",
-    options: [],
-    applicationId: "",
-    inputType: ApplicationCommandInputType.BUILT_IN_TEXT as number,
-    type: ApplicationCommandType.CHAT as number,
-    execute: (args, ctx) => {
-      sendBotMessage(ctx.channel.id, JSON.stringify(storage.settings, null, 2));
-    },
-  }),
 ];
 
 export function onUnload() {

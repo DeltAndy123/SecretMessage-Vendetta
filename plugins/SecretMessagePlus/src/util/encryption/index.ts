@@ -3,7 +3,6 @@ import { EncryptionMethods } from "../types";
 import { encryptMessage as encryptLegacy, decryptMessage as decryptLegacy } from "./legacy";
 import { bulkReplace } from "../util";
 import { AES, enc } from "crypto-js";
-import NodeRSA from "node-rsa";
 
 export function censorKey(key: string, hideLength?: boolean) {
   if (hideLength) {
@@ -20,7 +19,6 @@ export function encryptMessage(message: string, key: string, method: EncryptionM
       return encryptLegacy(message, key, storage.settings.shorten_text);
     case "aes":
       return AES.encrypt(message, key).toString();
-      // return message;
     case "rsa":
       return message;
   }

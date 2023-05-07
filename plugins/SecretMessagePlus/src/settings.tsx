@@ -1,8 +1,5 @@
 import { showToast } from "@vendetta/ui/toasts"
 import { MenuOption, SettingsComponent } from "./util/types"
-import NodeRSA from "@learntheropes/node-rsa"
-import { alerts } from "@vendetta/ui"
-import { storage } from "@vendetta/plugin"
 
 const encryptionMethods: MenuOption[] = [
   {
@@ -12,7 +9,7 @@ const encryptionMethods: MenuOption[] = [
   },
   {
     label: "RSA",
-    description: "Uses a public key to encrypt messages and a private key to decrypt them",
+    description: "Uses a public key to encrypt messages and a private key to decrypt them (Work in progress, not yet implemented)",
     value: "rsa"
   },
   {
@@ -94,34 +91,44 @@ export default [
         label: "Generate key pair",
         description: "Generate a new key pair (public and private key) to encrypt and decrypt messages and fill the fields above",
         onclick: () => {
-          alerts.showInputAlert({
-            title: "Enter key size",
-            initialValue: "2048",
-            confirmText: "Generate",
-            cancelText: "Cancel",
-            onConfirm(keySize) {
-              // const keySizeInt = parseInt(keySize);
-              // if (isNaN(keySizeInt) || 
-              //   keySizeInt < 1024 ||
-              //   keySizeInt > 16384 ||
-              //   keySizeInt % 1024 !== 0) {
-              //     alerts.showConfirmationAlert({
-              //       title: "Invalid key size",
-              //       content: "The key size must be a number between 1024 and 16384 and a multiple of 1024",
-              //       confirmText: "Ok",
-              //       onConfirm() {}
-              //     })
-              //     return
-              //   }
-              NodeRSA
-              // const key = new NodeRSA({b: 2048})
-              // const publicKey = key.exportKey("public");
-              // const privateKey = key.exportKey("private");
-              // storage.settings.rsa_public = publicKey;
-              // storage.settings.rsa_private = privateKey;
-              // showToast("Key pair generated and saved")
-            },
-          })
+          showToast("Not implemented yet")
+          // alerts.showInputAlert({
+          //   title: "Enter key size",
+          //   initialValue: "2048",
+          //   confirmText: "Generate",
+          //   cancelText: "Cancel",
+          //   async onConfirm(keySize) {
+          //     const keySizeInt = parseInt(keySize);
+          //     if (isNaN(keySizeInt) || 
+          //     keySizeInt < 1024 ||
+          //       keySizeInt > 16384 ||
+          //       keySizeInt % 1024 !== 0) {
+          //         alerts.showConfirmationAlert({
+          //           title: "Invalid key size",
+          //           content: "The key size must be a number between 1024 and 16384 and a multiple of 1024",
+          //           confirmText: "Ok",
+          //           onConfirm() {}
+          //         })
+          //         return
+          //       }
+          //     showToast("Generating key pair...")
+          //     const { rsa } = pki;
+          //     rsa.generateKeyPair({bits: keySizeInt, workers: -1}, (err, keypair) => {
+          //       if (err) {
+          //         alerts.showConfirmationAlert({
+          //           title: "Error generating key pair",
+          //           content: err.message,
+          //           confirmText: "Ok",
+          //           onConfirm() {}
+          //         })
+          //         return
+          //       }
+          //       storage.settings.rsa_public = keypair.publicKey;
+          //       storage.settings.rsa_private = keypair.privateKey;
+          //       showToast("Key pair generated and saved")
+          //     })
+          //   },
+          // })
         }
       }
     ]

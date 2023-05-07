@@ -3,9 +3,11 @@ import { semanticColors } from "@vendetta/ui";
 
 export const general = stylesheet.createThemedStyleSheet({
   group: {
+    // Used for rounded corners in groups
     // width: "90%",
     // marginLeft: "5%",
     // borderRadius: 10,
+
     backgroundColor: semanticColors.BACKGROUND_MOBILE_SECONDARY,
     overflow: "hidden",
   }
