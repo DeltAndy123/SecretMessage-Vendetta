@@ -1,12 +1,12 @@
 import { logger, metro, patcher } from "@vendetta";
 import { storage } from "@vendetta/plugin";
-import { encryptMessage, decryptMessage } from "./util/encryption";
+import { encryptMessage, decryptMessage, censorKey } from "./util/encryption";
 import { findByProps } from "@vendetta/metro";
 import { registerCommand } from "@vendetta/commands";
 import { generateSettingsPage, setDefaults } from "./util/settings";
 import settingsJson from "./settings";
-import { AES } from "crypto-js";
 import { getSuffixRegex } from "./util/encryption/legacy";
+import { bulkReplace } from "./util/util";
 
 enum ApplicationCommandOptionType {
   SUB_COMMAND = 1,
@@ -19,7 +19,7 @@ enum ApplicationCommandOptionType {
   ROLE,
   MENTIONABLE,
   NUMBER,
-  ATTACHMENT
+  ATTACHMENT,
 }
 
 enum ApplicationCommandInputType {
@@ -27,13 +27,13 @@ enum ApplicationCommandInputType {
   BUILT_IN_TEXT,
   BUILT_IN_INTEGRATION,
   BOT,
-  PLACEHOLDER
+  PLACEHOLDER,
 }
 
 enum ApplicationCommandType {
   CHAT = 1,
   USER,
-  MESSAGE
+  MESSAGE,
 }
 
 if (!storage.settings) storage.settings = setDefaults({}, settingsJson);
@@ -43,75 +43,130 @@ const { sendBotMessage } = findByProps("sendBotMessage");
 
 const patches = [
   patcher.before("dispatch", metro.common.FluxDispatcher, ([e]) => {
-    if (!storage.settings) return
+    if (!storage.settings) return;
     if (!storage.settings.enable_decryption) return;
     switch (e.type) {
       // Decrypt received messages
       case "MESSAGE_CREATE":
         if (!e.message.content) return;
-        e.message.content = decryptMessage(e.message.content, {
-          legacy: storage.settings.legacy_key,
-          rsa: storage.settings.rsa_private,
-          aes128: storage.settings.aes_key
-        }, storage.settings.decryption_methods);
-      break;
-      case "MESSAGE_UPDATE":
-        if (!e.message.content) return;
-        e.message.content = decryptMessage(e.message.content, {
-          legacy: storage.settings.legacy_key,
-          rsa: storage.settings.rsa_private,
-          aes128: storage.settings.aes_key
-        }, storage.settings.decryption_methods);
-      break;
-      case "LOAD_MESSAGES_SUCCESS":
-        e.messages.forEach((m: { content: string; }) => {
-          if (!m.content) return;
-          m.content = decryptMessage(m.content, {
+        e.message.content = decryptMessage(
+          e.message.content,
+          {
             legacy: storage.settings.legacy_key,
             rsa: storage.settings.rsa_private,
-            aes128: storage.settings.aes_key
-          }, storage.settings.decryption_methods);
+            aes: storage.settings.aes_key,
+          },
+          storage.settings.decryption_methods,
+          {
+            spoofKeyLength: storage.settings.spoof_key_length,
+          }
+        );
+        break;
+      case "MESSAGE_UPDATE":
+        if (!e.message.content) return;
+        e.message.content = decryptMessage(
+          e.message.content,
+          {
+            legacy: storage.settings.legacy_key,
+            rsa: storage.settings.rsa_private,
+            aes: storage.settings.aes_key,
+          },
+          storage.settings.decryption_methods,
+          {
+            spoofKeyLength: storage.settings.spoof_key_length,
+          }
+        );
+        break;
+      case "LOAD_MESSAGES_SUCCESS":
+        e.messages.forEach((m: { content: string }) => {
+          if (!m.content) return;
+          m.content = decryptMessage(
+            m.content,
+            {
+              legacy: storage.settings.legacy_key,
+              rsa: storage.settings.rsa_private,
+              aes: storage.settings.aes_key,
+            },
+            storage.settings.decryption_methods,
+            {
+              spoofKeyLength: storage.settings.spoof_key_length,
+            }
+          );
         });
-      break;
+        break;
     }
     if (storage.settings.debug) logger.info(e);
   }),
 
   // Encrypt sent messages
-  patcher.before("sendMessage", Messages, ([,msg]) => {
+  patcher.before("sendMessage", Messages, ([, msg]) => {
     if (storage.settings.enable_encryption) {
       switch (storage.settings.encryption_method) {
         case "legacy":
-          msg.content = encryptMessage(msg.content, storage.settings.legacy_key, "legacy");
-        break;
+          msg.content = encryptMessage(
+            msg.content,
+            storage.settings.legacy_key,
+            "legacy"
+          );
+          break;
         case "rsa":
-          msg.content = encryptMessage(msg.content, storage.settings.rsa_public, "rsa");
-        break;
-        case "aes-128":
-          msg.content = encryptMessage(msg.content, storage.settings.aes_key, "aes-128");
-        break;
+          msg.content = encryptMessage(
+            msg.content,
+            storage.settings.rsa_public,
+            "rsa"
+          );
+          break;
+        case "aes":
+          msg.content = encryptMessage(
+            msg.content,
+            storage.settings.aes_key,
+            "aes"
+          );
+          break;
       }
     }
   }),
-  patcher.before("editMessage", Messages, ([,msg]) => {
+  patcher.before("editMessage", Messages, ([, , msg]) => {
     if (storage.settings.enable_encryption) {
       switch (storage.settings.encryption_method) {
         case "legacy":
-          msg.content = encryptMessage(msg.content, storage.settings.legacy_key, "legacy");
-        break;
+          msg.content = encryptMessage(
+            msg.content,
+            storage.settings.legacy_key,
+            "legacy"
+          );
+          break;
         case "rsa":
-          msg.content = encryptMessage(msg.content, storage.settings.rsa_public, "rsa");
-        break;
-        case "aes-128":
-          msg.content = encryptMessage(msg.content, storage.settings.aes_key, "aes-128");
-        break;
+          msg.content = encryptMessage(
+            msg.content,
+            storage.settings.rsa_public,
+            "rsa"
+          );
+          break;
+        case "aes":
+          msg.content = encryptMessage(
+            msg.content,
+            storage.settings.aes_key,
+            "aes"
+          );
+          break;
       }
     }
   }),
-  patcher.before("startEditMessage", Messages, ([,,content]) => {
-    // Remove suffix (<key**>) from message when editing
-    // TODO: Fix not replacing the message starting to edit
-    content = content.replace(getSuffixRegex(storage.settings.key), "");
+  patcher.before("startEditMessage", Messages, (args) => {
+    // Remove suffix from message content when editing
+    const suffix = bulkReplace(storage.settings.decrypted_message_suffix, {
+      "{{METHOD}}": storage.settings.encryption_method,
+      "{{KEY}}": censorKey(
+        storage.settings.encryption_method === "legacy"
+          ? storage.settings.legacy_key
+          : storage.settings.encryption_method === "rsa"
+          ? storage.settings.rsa_public
+          : storage.settings.aes_key,
+        storage.settings.spoof_key_length
+      ),
+    });
+    args[2] = args[2].replace(` ${suffix}`, "");
   }),
 
   // // Slash commands
@@ -148,18 +203,18 @@ const patches = [
   //   }
   // })
   registerCommand({
-    name: 'test',
-    displayName: 'test',
-    description: 'test',
-    displayDescription: 'test',
+    name: "test",
+    displayName: "test",
+    description: "test",
+    displayDescription: "test",
     options: [],
-    applicationId: '',
+    applicationId: "",
     inputType: ApplicationCommandInputType.BUILT_IN_TEXT as number,
     type: ApplicationCommandType.CHAT as number,
     execute: (args, ctx) => {
       sendBotMessage(ctx.channel.id, JSON.stringify(storage.settings, null, 2));
-    }
-  })
+    },
+  }),
 ];
 
 export function onUnload() {

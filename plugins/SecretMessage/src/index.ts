@@ -64,15 +64,15 @@ const unload = [
       msg.content = encryptMessage(msg.content);
     }
   }),
-  patcher.before("editMessage", Messages, ([,msg]) => {
+  patcher.before("editMessage", Messages, ([,,msg]) => {
     if (storage.enable_encryption) {
       msg.content = encryptMessage(msg.content);
     }
   }),
-  patcher.before("startEditMessage", Messages, ([,,content]) => {
+  patcher.before("startEditMessage", Messages, (args) => {
     // Remove suffix (<key**>) from message when editing
     // TODO: Fix not replacing the message starting to edit
-    content = content.replace(getSuffixRegex(storage.key), "");
+    args[2] = args[2].replace(getSuffixRegex(storage.key), "");
   }),
 
   // Slash commands

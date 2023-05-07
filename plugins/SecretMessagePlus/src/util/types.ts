@@ -81,6 +81,6 @@ function isConfigSettingsComponent(
   return "key" in component;
 }
 
-type EncryptionMethods = "legacy" | "aes-128" | "rsa";
+type EncryptionMethods = "legacy" | "aes" | "rsa";
 
 export { SettingsComponent, MenuOption, isJSXElement, isConfigSettingsComponent, EncryptionMethods };

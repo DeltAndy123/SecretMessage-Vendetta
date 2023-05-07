@@ -17,15 +17,6 @@ function getSikibetu(key) {
     return `${e("secret", key).slice(0, 3).padStart(3, '?')}` // 3桁の認識キーを生成
 }
 
-function censorKey(key: string, hideLength?: boolean) {
-    // return `${key.slice(0, 2)}${'*'.repeat(Math.max(key.length - 2, 0))}` // 末尾につける現在のキーを確認するための文字列
-    if (hideLength) {
-        return `${key.slice(0, 2)}***`
-    } else {
-        return `${key.slice(0, 2)}${'*'.repeat(Math.max(key.length - 2, 0))}`
-    }
-}
-
 function getSuffixRegex(key) {
     return new RegExp(` \`<${key.slice(0, 2)}${'\\*'.repeat(Math.max(key.length - 2, 0))}>\`$`)
 }
@@ -115,4 +106,4 @@ function angouKaigyou(text) {
     return text.replaceAll("\x0B", "\u2002").replaceAll("\x0C", "\u2003").replaceAll("\r", "\u2004").replaceAll("\n", "\u2001")
 }
 
-export {e, decryptMessage, encryptMessage, getSikibetu, censorKey, getSuffixRegex}
+export {e, decryptMessage, encryptMessage, getSikibetu, getSuffixRegex}

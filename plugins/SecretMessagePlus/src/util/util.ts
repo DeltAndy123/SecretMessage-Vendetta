@@ -9,7 +9,7 @@ export function bulkReplace(
   replacements: { [key: string]: string },
 ): string {
   for (const [key, value] of Object.entries(replacements)) {
-    string = string.replace(key, value);
+    string = string.replaceAll(key, value);
   }
   return string;
 }
