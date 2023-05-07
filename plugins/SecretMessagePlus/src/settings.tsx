@@ -43,6 +43,13 @@ export default [
         description: "The suffix appended to decrypted messages.",
         key: "decrypted_message_suffix",
         default: "`[{{METHOD}} ({{KEY}})]`"
+      },
+      {
+        type: "switch",
+        label: "Spoof key length",
+        description: "Always make the key length shown as 5 characters long when decrypted messages are shown. (Example: if key is 123456789, it will be shown as 12*** instead of 12*******)",
+        key: "spoof_key_length",
+        default: true
       }
     ],
     description: "Valid placeholders: {{METHOD}}, {{KEY}} (KEY will be censored)"
@@ -162,13 +169,6 @@ export default [
         label: "Auto shorten text",
         description: "Shorten encrypted text by replacing specific char. Can be detected by AutoMod.",
         key: "shorten_text",
-        default: true
-      },
-      {
-        type: "switch",
-        label: "Spoof key length",
-        description: "Always make the key length shown as 5 characters long when decrypted messages are shown. (Example: if key is 123456789, it will be shown as 12*** instead of 12*******)",
-        key: "spoof_key_length",
         default: true
       }
     ]
